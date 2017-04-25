@@ -304,6 +304,12 @@
     switch ( recognizer.state ) {
         case UIGestureRecognizerStateBegan:
             self.dragging = YES;
+            
+            if ( [self.delegate respondsToSelector:@selector(timeline:didStartDraggingFromDate:)] ) {
+                [self.delegate timeline:self
+               didStartDraggingFromDate:self.selectedDate];
+            }
+            
             break;
             
         case UIGestureRecognizerStateEnded:
@@ -312,9 +318,9 @@
             self.dragging = NO;
             
             // Inform the delegate that a date was picked
-            if ( [self.delegate respondsToSelector:@selector(timeline:didChangeDate:)] ) {
+            if ( [self.delegate respondsToSelector:@selector(timeline:didStopDraggingAtDate:)] ) {
                 [self.delegate timeline:self
-                          didChangeDate:self.selectedDate];
+                  didStopDraggingAtDate:self.selectedDate];
             }
             
             break;
@@ -866,9 +872,9 @@ static CGFloat sideDateWidth = 80.0f;
     self.sideDates      = nil; // Force redrawing of side dates
     [self setNeedsDisplay];
     
-    if ( [self.delegate respondsToSelector:@selector(timeline:didChangeDate:)] ) {
+    if ( [self.delegate respondsToSelector:@selector(timeline:didStopDraggingAtDate:)] ) {
         [self.delegate timeline:self
-                  didChangeDate:date];
+          didStopDraggingAtDate:date];
     }
 }
 

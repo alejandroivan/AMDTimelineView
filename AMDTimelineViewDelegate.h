@@ -13,7 +13,8 @@
 @class AMDTimelineView;
 @protocol AMDTimelineViewDelegate <NSObject>
 
-- (void)timeline:(AMDTimelineView *)timeline didChangeDate:(NSDate *)newDate;
+- (void)timeline:(AMDTimelineView *)timeline didStartDraggingFromDate:(NSDate *)oldDate;
+- (void)timeline:(AMDTimelineView *)timeline didStopDraggingAtDate:(NSDate *)newDate;
 - (void)timeline:(AMDTimelineView *)timeline didChangeZoomScale:(AMDTimelineViewZoomScale)newZoomScale;
 
 @end
