@@ -181,11 +181,15 @@
     NSTimeInterval minimumDateTI    = [self.minimumDate timeIntervalSince1970];
     NSTimeInterval maximumDateTI    = [self.maximumDate timeIntervalSince1970];
     
-    currentDateTI = MAX(minimumDateTI,
-                        MIN(maximumDateTI,
-                            currentDateTI));
+    currentDateTI                   = MAX(
+                                          minimumDateTI,
+                                          MIN(
+                                              maximumDateTI,
+                                              currentDateTI
+                                              )
+                                          );
     
-    self.selectedDate = [NSDate dateWithTimeIntervalSince1970:currentDateTI];
+    self.selectedDate               = [NSDate dateWithTimeIntervalSince1970:currentDateTI];
     
     [self setNeedsDisplay];
 }
@@ -219,11 +223,11 @@
     NSTimeInterval selectedDateTI   = [self.selectedDate timeIntervalSince1970] + TIMER_UPDATE_TIME;
     self.selectedDate               = [NSDate dateWithTimeIntervalSince1970:selectedDateTI];
     
-    CGFloat maxSideDateDistance = CGRectGetWidth(self.bounds) / 4;
-    self.sideDateInternalOffset = self.sideDateInternalOffset - TIMER_UPDATE_TIME * [self pixelMultiplierForZoomScale:self.zoomLevel];
+    CGFloat maxSideDateDistance     = CGRectGetWidth(self.bounds) / 4;
+    self.sideDateInternalOffset     = self.sideDateInternalOffset - TIMER_UPDATE_TIME * [self pixelMultiplierForZoomScale:self.zoomLevel];
     
     if ( ABS(self.sideDateInternalOffset) > maxSideDateDistance ) {
-        NSNumber *dist = @( self.sideDateInternalOffset );
+        NSNumber *dist              = @( self.sideDateInternalOffset );
         self.sideDateInternalOffset = [dist doubleValue] - [dist integerValue];
     }
     
@@ -259,46 +263,44 @@
                         inView:self];
     
     
-    // Calcular fecha seleccionada
+    // Calculate the selected date
     NSTimeInterval timeIntervalDiff = -translation.x * [self pixelMultiplierForZoomScale:self.zoomLevel];
-    NSDate *selDateTemp = [self.selectedDate dateByAddingTimeInterval:timeIntervalDiff];
-    self.selectedDate = selDateTemp;
+    NSDate *selDateTemp             = [self.selectedDate dateByAddingTimeInterval:timeIntervalDiff];
+    self.selectedDate               = selDateTemp;
     
     if ( [selDateTemp timeIntervalSince1970] > [self.maximumDate timeIntervalSince1970] || [selDateTemp timeIntervalSince1970] < [self.minimumDate timeIntervalSince1970] ) {
         return;
     }
     
-    // Actualizar offsets
+    // Update offsets
     self.currentOffset += translation.x * [self pixelMultiplierForZoomScale:self.zoomLevel];
     
-    // Restringir self.sideMarkerInternalOffset al máximo offset aceptable (1 punto = 1 segundo)
-    CGFloat maxSideMarkerDistance = 60.0f / MAX( 1, self.maximumZoomScale - self.zoomLevel );
-    CGFloat maxSideDateDistance = CGRectGetWidth(self.bounds) / 4;
+    // Restrict self.sideMarkerInternalOffset to the maximum acceptable offset (1 point = 1 second)
+    CGFloat maxSideMarkerDistance   = 60.0f / MAX( 1, self.maximumZoomScale - self.zoomLevel );
+    CGFloat maxSideDateDistance     = CGRectGetWidth(self.bounds) / 4;
     
-    // Evitar que se siga haciendo scroll si se ha llegado a una fecha límite
+    // Avoid scrolling if a limit date was reached
     self.sideMarkerInternalOffset   += translation.x;
     self.sideDateInternalOffset     += translation.x;
     
     
     
     if ( ABS(self.sideMarkerInternalOffset) > maxSideMarkerDistance ) {
-        NSUInteger multiplier = ABS(self.sideMarkerInternalOffset) / maxSideMarkerDistance;
-        CGFloat sign = self.sideMarkerInternalOffset < 0 ? -1 : 1;
-        
-        self.sideMarkerInternalOffset = sign * ( ABS(self.sideMarkerInternalOffset) - multiplier * maxSideMarkerDistance ) ;
+        NSUInteger multiplier           = ABS(self.sideMarkerInternalOffset) / maxSideMarkerDistance;
+        CGFloat sign                    = self.sideMarkerInternalOffset < 0 ? -1 : 1;
+        self.sideMarkerInternalOffset   = sign * ( ABS(self.sideMarkerInternalOffset) - multiplier * maxSideMarkerDistance ) ;
     }
     
     
     if ( ABS(self.sideDateInternalOffset) > maxSideDateDistance ) {
-        NSUInteger multiplier = ABS(self.sideDateInternalOffset) / maxSideDateDistance;
-        CGFloat sign = self.sideDateInternalOffset < 0 ? -1 : 1;
-        
+        NSUInteger multiplier       = ABS(self.sideDateInternalOffset) / maxSideDateDistance;
+        CGFloat sign                = self.sideDateInternalOffset < 0 ? -1 : 1;
         self.sideDateInternalOffset = sign * ( ABS(self.sideDateInternalOffset) - multiplier * maxSideDateDistance ) ;
         [self reinitSideDates];
     }
     
     
-    // Estados del gesture recognizer
+    // Gesture recognizer states
     switch ( recognizer.state ) {
         case UIGestureRecognizerStateBegan:
             self.dragging = YES;
@@ -309,7 +311,7 @@
         case UIGestureRecognizerStateCancelled:
             self.dragging = NO;
             
-            // Informar al delegate que se eligió una fecha
+            // Inform the delegate that a date was picked
             if ( [self.delegate respondsToSelector:@selector(timeline:didChangeDate:)] ) {
                 [self.delegate timeline:self
                           didChangeDate:self.selectedDate];
@@ -340,16 +342,20 @@
     
     CGFloat delta       = sign * scale * speed;
     
-    self.zoomLevel      = MIN(self.maximumZoomScale,
-                              MAX(self.minimumZoomScale,
-                                  self.zoomLevel + delta));
+    self.zoomLevel      = MIN(
+                              self.maximumZoomScale,
+                              MAX(
+                                  self.minimumZoomScale,
+                                  self.zoomLevel + delta
+                                  )
+                              );
     
     switch ( recognizer.state ) {
         case UIGestureRecognizerStateCancelled:
         case UIGestureRecognizerStateFailed:
         case UIGestureRecognizerStateEnded: {
-            self.zoomLevel = [self zoomScaleFromZoomLevel:self.zoomLevel];
-            self.sideMarkerInternalOffset /= [self zoomScaleFromZoomLevel:self.zoomLevel];
+            self.zoomLevel                  = [self zoomScaleFromZoomLevel:self.zoomLevel];
+            self.sideMarkerInternalOffset   /= [self zoomScaleFromZoomLevel:self.zoomLevel];
             
             [self.sideDates removeAllObjects];
             [self reinitSideDates];
@@ -358,6 +364,7 @@
                 [self.delegate timeline:self
                      didChangeZoomScale:self.zoomLevel];
             }
+            
             break;
         }
             
@@ -403,13 +410,11 @@
 - (void)drawRect:(CGRect)rect {
     // Drawing code
     CGContextRef ctx    = UIGraphicsGetCurrentContext();
-    _ctx                = ctx;
+    _ctx                = ctx; // Keep a strong reference to the graphics context to avoid possible dealloc issues
     
-    // Llamar en orden, desde el elemento más abajo hacia el más arriba
-    
+    // Call in order: from the lowest element until the top one
     [self drawBackgroundColor:ctx];
     [self drawHorizontalLine:ctx];
-    //[self drawSideMarkers:ctx];
     [self drawDateString:ctx];
     [self drawCentralMarker:ctx];
     [self drawSideDatesStrings:ctx];
@@ -440,9 +445,8 @@
 
 - (void)drawHorizontalLine:(CGContextRef)ctx {
     CGFloat distanceFromTop = CGRectGetMaxY(self.bounds) - self.centerMarkerVerticalDistanceFromBottom - self.centerMarkerHeight - self.horizontalLineVerticalDistanceFromCenterMarkerTop;
-    
-    CGPoint startPoint  = CGPointMake(CGRectGetMinX(self.bounds), distanceFromTop);
-    CGPoint endPoint    = CGPointMake(startPoint.x + CGRectGetMaxX(self.bounds), distanceFromTop);
+    CGPoint startPoint      = CGPointMake(CGRectGetMinX(self.bounds), distanceFromTop);
+    CGPoint endPoint        = CGPointMake(startPoint.x + CGRectGetMaxX(self.bounds), distanceFromTop);
     
     CGContextMoveToPoint(ctx, startPoint.x, startPoint.y);
     CGContextSetStrokeColorWithColor(ctx, self.horizontalLineColor.CGColor);
@@ -460,64 +464,17 @@
 
 
 
-/*- (void)drawSideMarkers:(CGContextRef)ctx {
-    
-    CGFloat centerPointPosX             = CGRectGetMidX(self.bounds);
-    CGFloat sideMarkerTop               = CGRectGetMaxY(self.bounds) - ( self.centerMarkerVerticalDistanceFromBottom + self.centerMarkerHeight + self.horizontalLineVerticalDistanceFromCenterMarkerTop );
-    CGFloat sideMarkerHeightMultiplier  = self.centerMarkerHeight / 4 * 2/3;
-    
-    CGFloat sideMarkerBottom            = sideMarkerTop + sideMarkerHeightMultiplier * self.zoomLevel;
-    
-    CGFloat distanceBetweenMarkers      = 60.0f / MAX( 1, self.maximumZoomScale - self.zoomLevel );
-    
-    NSUInteger numberOfMarkers      = CGRectGetWidth(self.bounds) / distanceBetweenMarkers + 10; // 10 marcadores extra, 5 a cada lado, para evitar problemas de redibujado ante el zoom
-    
-    for ( NSUInteger i = 0, totalMarkers = numberOfMarkers / 2; i < totalMarkers; i++ ) {
-        CGFloat distance;
-        CGPoint origin, destination;
-        
-        CGContextSetStrokeColorWithColor(ctx, self.sideMarkerColor.CGColor);
-        CGContextSetLineWidth(ctx, self.sideMarkerWidth);
-        
-        // Lado izquierdo
-        distance    = centerPointPosX - distanceBetweenMarkers * i + self.sideMarkerInternalOffset;
-        origin      = CGPointMake( distance, sideMarkerTop );
-        destination = CGPointMake( distance, sideMarkerBottom );
-        
-        CGContextMoveToPoint(ctx, origin.x, origin.y);
-        CGContextAddLineToPoint(ctx, destination.x, destination.y);
-        
-        // Lado derecho
-        distance    = centerPointPosX + distanceBetweenMarkers * i + self.sideMarkerInternalOffset;
-        origin      = CGPointMake( distance, sideMarkerTop );
-        destination = CGPointMake( distance, sideMarkerBottom );
-        
-        CGContextMoveToPoint(ctx, origin.x, origin.y);
-        CGContextAddLineToPoint(ctx, destination.x, destination.y);
-    }
-
-    CGContextStrokePath(ctx);
-    
-}*/
-
-
-
-
-
-
-
-
-
 
 - (void)drawDateString:(CGContextRef)ctx {
     
     // CONTAINER
     
-    CGFloat margin = 2.0f;  // Margin from the elements nearby (sides of the container, bottom of the container and the bottom of the center marker)
+    CGFloat margin          = 2.0f;  // Margin from the elements nearby (sides of the container, bottom of the container and the bottom of the center marker)
     CGRect containerFrame   = CGRectMake(margin,
                                          CGRectGetMaxY(self.bounds) - self.centerMarkerVerticalDistanceFromBottom + margin,
                                          CGRectGetMaxX(self.bounds) - 2 * margin,
                                          self.centerMarkerVerticalDistanceFromBottom - 2 * margin);
+    
     
     CGContextSetFillColorWithColor(ctx, self.selectedDateBackgroundColor.CGColor);
     CGContextFillRect(ctx, containerFrame);
@@ -557,19 +514,19 @@
 static NSInteger numberOfSideDates = 6;
 
 - (void)reinitSideDates {
-//    CGFloat zoomMultiplier          = ( self.maximumZoomScale - self.zoomLevel + 1 );
-    CGFloat distance                = CGRectGetWidth(self.bounds) / 4;
-    CGFloat initialDistance         = - ( ( numberOfSideDates + 1 ) / 2 ) * distance;
+    CGFloat distance        = CGRectGetWidth(self.bounds) / 4;
+    CGFloat initialDistance = - ( ( numberOfSideDates + 1 ) / 2 ) * distance;
     
     
-    // Setear fechas laterales cada vez que se muestra la vista o se hace zoom
+    // Set the side dates every time the view is shown or zoomed
     if ( ! self.sideDates || self.sideDates.count == 0 ) {
         
         _lastRedrawOffset           = self.currentOffset;
         self.sideDateInternalOffset = 0.0f;
         self.sideDates              = [[NSMutableArray alloc] init];
         
-        double pos = initialDistance;
+        double pos                  = initialDistance;
+        
         for ( NSUInteger i = 0; i < numberOfSideDates + 1; i++ ) {
             double secondsOffset                = pos * [self pixelMultiplierForZoomScale:self.zoomLevel];
 
@@ -593,8 +550,8 @@ static NSInteger numberOfSideDates = 6;
     }
     
     
-    // Si se hace drag, cambiar las posiciones de las fechas
-    else if ( self.currentOffset > _lastRedrawOffset ) { // La fecha de la derecha desaparece y va a la izquierda
+    // If dragged, change the position of the dates
+    else if ( self.currentOffset > _lastRedrawOffset ) { // The right date disappears and goes to the left side
         _lastRedrawOffset                   = self.currentOffset;
         AMDTimelineViewSideDate *lastDate   = [self.sideDates lastObject];
         
@@ -602,12 +559,13 @@ static NSInteger numberOfSideDates = 6;
         [self.sideDates insertObject:lastDate
                              atIndex:0];
         
-        // Recalcular posiciones iniciales
+        // Recalculate initial positions
         
         double pos = initialDistance;
+        
         for ( NSUInteger i = 0, total = self.sideDates.count; i < total; i++ ) {
             
-            AMDTimelineViewSideDate *sideDate   = [self.sideDates objectAtIndex:i];
+            AMDTimelineViewSideDate *sideDate   = self.sideDates[i];
             sideDate.initialPosition            = pos;
             
             if ( i == 0 ) {
@@ -622,7 +580,7 @@ static NSInteger numberOfSideDates = 6;
                                                                                        toDate:self.selectedDate
                                                                                       options:kNilOptions];
                 
-                sideDate.date = offsetDate; // Si i = 0, entonces es la fecha que se movió del final... actualizar fecha almacenada
+                sideDate.date = offsetDate; // If i = 0, then it's the date that was moved from the right... update the stored date
             }
             
             pos += distance;
@@ -631,21 +589,21 @@ static NSInteger numberOfSideDates = 6;
     }
     
     
-    else { // La fecha de la izquierda desaparece y va a la derecha
+    else { // The left date disappears and goes to the right side
         AMDTimelineViewSideDate *firstDate = [self.sideDates firstObject];
 
         [self.sideDates removeObjectAtIndex:0];
-        [self.sideDates addObject:firstDate];   // La fecha inicial queda al final de la lista
+        [self.sideDates addObject:firstDate]; // The initial date goes to the end of the list
         
-        // Recalcular posiciones iniciales
+        // Recalculate initial positions
         
         double pos = initialDistance;
         for ( NSUInteger i = 0, total = self.sideDates.count; i < total; i++ ) {
             
-            AMDTimelineViewSideDate *sideDate   = [self.sideDates objectAtIndex:i];
+            AMDTimelineViewSideDate *sideDate   = self.sideDates[i];
             sideDate.initialPosition            = pos;
             
-            if ( i == self.sideDates.count-1 ) { // Si i = total - 1, entonces es la sideDate que se movió del principio del array... actualizar fecha almacenada
+            if ( i == self.sideDates.count-1 ) { // If i = total - 1, then it's the side date that was moved from the beginning of the array... update it's stored date
                 double secondsOffset                = pos * [self pixelMultiplierForZoomScale:self.zoomLevel];
                 
                 NSCalendar *currentCalendar         = [NSCalendar currentCalendar];
@@ -657,7 +615,7 @@ static NSInteger numberOfSideDates = 6;
                                                                                        toDate:self.selectedDate
                                                                                       options:kNilOptions];
                 
-                sideDate.date = offsetDate;
+                sideDate.date                       = offsetDate;
             }
             
             pos += distance;
@@ -666,6 +624,8 @@ static NSInteger numberOfSideDates = 6;
     }
     
 }
+
+
 
 static CGFloat sideDateWidth = 80.0f;
 
@@ -677,9 +637,9 @@ static CGFloat sideDateWidth = 80.0f;
     
     
     for ( NSUInteger i = 0, total = self.sideDates.count; i < total; i++ ) {
-        AMDTimelineViewSideDate *sideDate = [self.sideDates objectAtIndex:i];
-        CGFloat finalCenter = sideDate.initialPosition + self.sideDateInternalOffset + CGRectGetMidX(self.bounds);
-        CGFloat alphaBorder = sideDateWidth * 2;
+        AMDTimelineViewSideDate *sideDate   = self.sideDates[i];
+        CGFloat finalCenter                 = sideDate.initialPosition + self.sideDateInternalOffset + CGRectGetMidX(self.bounds);
+        CGFloat alphaBorder                 = sideDateWidth * 2;
         
         if ( finalCenter <  CGRectGetMidX(self.bounds) - alphaBorder || finalCenter > CGRectGetMidX(self.bounds) + alphaBorder ) {
             [self drawDate:sideDate.date
@@ -701,15 +661,14 @@ static CGFloat sideDateWidth = 80.0f;
 
 - (void)drawDate:(NSDate *)date centeredIn:(double)horizontalCenter alpha:(CGFloat)alpha context:(CGContextRef)ctx {
     
-    CGFloat sideMarkerTop               = CGRectGetMaxY(self.bounds) - ( self.centerMarkerVerticalDistanceFromBottom + self.centerMarkerHeight + self.horizontalLineVerticalDistanceFromCenterMarkerTop );
-    CGFloat sideMarkerHeightMultiplier  = self.centerMarkerHeight / 4 * 2/3;
-    CGFloat sideMarkerBottom            = sideMarkerTop + sideMarkerHeightMultiplier * self.zoomLevel;
+    CGFloat sideMarkerTop                   = CGRectGetMaxY(self.bounds) - ( self.centerMarkerVerticalDistanceFromBottom + self.centerMarkerHeight + self.horizontalLineVerticalDistanceFromCenterMarkerTop );
+    CGFloat sideMarkerHeightMultiplier      = self.centerMarkerHeight / 4 * 2/3;
+    CGFloat sideMarkerBottom                = sideMarkerTop + sideMarkerHeightMultiplier * self.zoomLevel;
     
-    CGFloat margin  = 4.0f;
-    
-    CGFloat width   = sideDateWidth;
-    CGFloat top     = sideMarkerBottom + margin;
-    CGFloat left    = horizontalCenter - width / 2;
+    CGFloat margin                          = 4.0f;
+    CGFloat width                           = sideDateWidth;
+    CGFloat top                             = sideMarkerBottom + margin;
+    CGFloat left                            = horizontalCenter - width / 2;
     
     self.dateFormatter.dateFormat           = [self dateFormatForScale:self.zoomLevel];
     NSString *sideDateString                = [self.dateFormatter stringFromDate:date];
@@ -734,7 +693,8 @@ static CGFloat sideDateWidth = 80.0f;
                                                          CGRectGetWidth(dateContainer),
                                                          CGRectGetHeight(dateContainer) - 2 * offset);
     
-    CGFloat deltaY = CGRectGetMidY(textFrame) - CGRectGetMinY(textFrame);
+    CGFloat deltaY                          = CGRectGetMidY(textFrame) - CGRectGetMinY(textFrame);
+    
     [self drawSideMarkerFromBottomPoint:CGPointMake(CGRectGetMidX(textFrame),
                                                     CGRectGetMidY(textFrame) - 2 * deltaY)
                                   alpha:alpha
@@ -746,9 +706,10 @@ static CGFloat sideDateWidth = 80.0f;
 
 - (void)updateSideDatesOffsets:(CGContextRef)ctx {
     for ( NSUInteger i = 0, total = self.sideDates.count; i < total; i++ ) {
-        AMDTimelineViewSideDate *sideDate = [self.sideDates objectAtIndex:i];
-        CGFloat finalCenter = sideDate.initialPosition + self.sideDateInternalOffset + CGRectGetMidX(self.bounds);
-        CGFloat alphaBorder = sideDateWidth * 2;
+        
+        AMDTimelineViewSideDate *sideDate   = self.sideDates[i];
+        CGFloat finalCenter                 = sideDate.initialPosition + self.sideDateInternalOffset + CGRectGetMidX(self.bounds);
+        CGFloat alphaBorder                 = sideDateWidth * 2;
         
         if ( finalCenter <  CGRectGetMidX(self.bounds) - alphaBorder || finalCenter > CGRectGetMidX(self.bounds) + alphaBorder ) {
             [self drawDate:sideDate.date
@@ -765,6 +726,7 @@ static CGFloat sideDateWidth = 80.0f;
                    context:ctx];
             
         }
+        
     }
 }
 
@@ -880,7 +842,6 @@ static CGFloat sideDateWidth = 80.0f;
     NSTimeInterval selectedDateTI   = MAX( minimumDateTI, MIN( argumentDateTI, maximumDateTI ) );
     
     _selectedDate   = [NSDate dateWithTimeIntervalSince1970:selectedDateTI];
-//    NSLog(@"Selected: %@ - Maximum: %@", _selectedDate, _maximumDate);
 }
 
 - (void)setMinimumDate:(NSDate *)minimumDate {
@@ -924,7 +885,7 @@ static CGFloat sideDateWidth = 80.0f;
             return @"HH:mm:ss";
             
         default:
-            return @"dd/MM/yyyy\n HH:mm:ss";
+            return @"dd/MM/yyyy\nHH:mm:ss";
     }
 }
 
@@ -959,9 +920,10 @@ static CGFloat sideDateWidth = 80.0f;
 
 - (double)secondsPerPixelWithZoomScale:(double)zoomScale {
     double secondsPerPixel;
-    NSUInteger zoom = zoomScale;
     
-    CGFloat scale = [@(zoomScale) doubleValue] - [@(zoomScale) integerValue];
+    NSUInteger zoom = zoomScale;
+    CGFloat scale   = [@(zoomScale) doubleValue] - [@(zoomScale) integerValue];
+    
     if ( scale > 0.7f ) {
         zoom++;
     }
