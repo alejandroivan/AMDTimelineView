@@ -42,8 +42,6 @@
 
 
 @property (assign, nonatomic) CGFloat zoomLevel;                                // Bypassing "readonly"
-@property (assign, nonatomic) AMDTimelineViewZoomScale minimumZoomScale;        // Bypassing "readonly"
-@property (assign, nonatomic) AMDTimelineViewZoomScale maximumZoomScale;        // Bypassing "readonly"
 @property (strong, nonatomic) NSDate *selectedDate;                             // Bypassing "readonly"
 
 @property (strong, nonatomic) NSMutableArray *sideDates;

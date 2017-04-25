@@ -123,8 +123,8 @@ IB_DESIGNABLE
  
     See AMDTimelineViewZoomScale.h for defined zoom scales and their values.
  */
-@property (assign, nonatomic, readonly) AMDTimelineViewZoomScale minimumZoomScale;
-@property (assign, nonatomic, readonly) AMDTimelineViewZoomScale maximumZoomScale;
+@property (assign, nonatomic) AMDTimelineViewZoomScale minimumZoomScale;
+@property (assign, nonatomic) AMDTimelineViewZoomScale maximumZoomScale;
 @property (assign, nonatomic, readonly) CGFloat zoomLevel;
 
 
