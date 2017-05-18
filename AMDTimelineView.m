@@ -868,11 +868,16 @@ static CGFloat sideDateWidth = 80.0f;
 
 
 - (void)goToDate:(NSDate *)date {
+    [self goToDate:date
+    informDelegate:YES];
+}
+
+- (void)goToDate:(NSDate *)date informDelegate:(BOOL)informDelegate {
     self.selectedDate   = date;
     self.sideDates      = nil; // Force redrawing of side dates
     [self setNeedsDisplay];
     
-    if ( [self.delegate respondsToSelector:@selector(timeline:didStopDraggingAtDate:)] ) {
+    if ( informDelegate && [self.delegate respondsToSelector:@selector(timeline:didStopDraggingAtDate:)] ) {
         [self.delegate timeline:self
           didStopDraggingAtDate:date];
     }

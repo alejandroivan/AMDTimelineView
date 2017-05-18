@@ -97,6 +97,7 @@ IB_DESIGNABLE
 @property (strong, nonatomic) NSDate *maximumDate;              // Maximum selectable date in the timeline.
 
 - (void)goToDate:(NSDate *)date;
+- (void)goToDate:(NSDate *)date informDelegate:(BOOL)informDelegate;
 
 
 
