@@ -95,6 +95,7 @@ IB_DESIGNABLE
 @property (strong, nonatomic, readonly) NSDate *selectedDate;   // Current date selected by the user in the timeline.
 @property (strong, nonatomic) NSDate *minimumDate;              // Minimum selectable date in the timeline.
 @property (strong, nonatomic) NSDate *maximumDate;              // Maximum selectable date in the timeline.
+@property (assign, nonatomic) BOOL maximumDateIsCurrentDate;    // Automatically set the maximum selectable date to the current date.
 
 - (void)goToDate:(NSDate *)date;
 - (void)goToDate:(NSDate *)date informDelegate:(BOOL)informDelegate;

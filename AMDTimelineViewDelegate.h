@@ -18,6 +18,8 @@
 - (void)timeline:(AMDTimelineView *)timeline didStopDraggingAtDate:(NSDate *)newDate;
 - (void)timeline:(AMDTimelineView *)timeline didChangeZoomScale:(AMDTimelineViewZoomScale)newZoomScale;
 
+- (void)timeline:(AMDTimelineView *)timeline didRedrawToNewDate:(NSDate *)newDate;
+
 @end
 
 #endif /* AMDTimelineViewDelegate_h */

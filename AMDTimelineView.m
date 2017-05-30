@@ -177,6 +177,14 @@
     self.minimumDate = [self.minimumDate dateByAddingTimeInterval:AMD_INTERNAL_TIMER_UPDATE_TIME];
     self.maximumDate = [self.maximumDate dateByAddingTimeInterval:AMD_INTERNAL_TIMER_UPDATE_TIME];
     
+    if ( self.maximumDateIsCurrentDate ) {
+        
+        if ( [@([self.maximumDate timeIntervalSince1970]) unsignedIntegerValue] != [@([[NSDate date] timeIntervalSince1970]) unsignedIntegerValue] ) {
+            self.maximumDate = [NSDate date];
+        }
+        
+    }
+    
     NSTimeInterval currentDateTI    = [self.selectedDate timeIntervalSince1970];
     NSTimeInterval minimumDateTI    = [self.minimumDate timeIntervalSince1970];
     NSTimeInterval maximumDateTI    = [self.maximumDate timeIntervalSince1970];
@@ -229,6 +237,11 @@
     if ( ABS(self.sideDateInternalOffset) > maxSideDateDistance ) {
         NSNumber *dist              = @( self.sideDateInternalOffset );
         self.sideDateInternalOffset = [dist doubleValue] - [dist integerValue];
+    }
+    
+    if ( [self.delegate respondsToSelector:@selector(timeline:didRedrawToNewDate:)] ) {
+        [self.delegate timeline:self
+             didRedrawToNewDate:self.selectedDate];
     }
     
     [self setNeedsDisplay];
